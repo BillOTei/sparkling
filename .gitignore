@@ -1,9 +1,7 @@
 logs
 project/project
-project/target
 target
 tmp
-.history
 dist
 /.idea
 /*.iml
@@ -14,3 +12,4 @@ dist
 /RUNNING_PID
 /.settings
 .DS_Store
+src/test/

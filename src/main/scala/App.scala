@@ -4,23 +4,19 @@ import org.joda.time.{DateTime, Period}
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
 import org.apache.spark.{SparkConf, SparkContext}
+import org.joda.time.format.PeriodFormat
 
 import scala.util.Random
 
-object App {
+object App extends SparkSessionWrapper {
   def main(args: Array[String]): Unit = {
     Logger.getLogger("org").setLevel(Level.WARN)
-    val conf = ConfigFactory.load()
-    val sConf = new SparkConf()
-      .setMaster(conf.getString("spark.master"))
-      .setAppName(conf.getString("spark.app-name"))
-    val spark = new SparkContext(sConf)
 
-    val partitionsNb = 17
-    val skewedRdd = spark.parallelize(0 to partitionsNb, partitionsNb).flatMap(i =>
+    val partitionsNb = 16
+    val skewedRdd = spark.sparkContext.parallelize(0 to partitionsNb, partitionsNb).flatMap(i =>
       0 until Math.exp(i).toInt
     ).mapPartitionsWithIndex((i, p) => p.map((i, _))).cache()
-    val smallRdd = spark.parallelize(0 to partitionsNb, partitionsNb).flatMap(i =>
+    val smallRdd = spark.sparkContext.parallelize(0 to partitionsNb, partitionsNb).flatMap(i =>
       0 until i
     ).mapPartitionsWithIndex((i, p) => p.map((i, _))).cache()
 
@@ -30,25 +26,26 @@ object App {
     println(s"Total count skewed ${skewedRdd.count()}")
     println(s"Total count small ${smallRdd.count()}")
 
-    //intersectRdds(skewedRdd, smallRdd)
+    intersectRdds(skewedRdd, smallRdd)
 
     val n = 100
     val smallRddTransformed = smallRdd
-      .cartesian(spark.parallelize(0 until n))
-      .map(x => ((x._1._1, x._2), x._1._2)).cache()
+      .cartesian(spark.sparkContext.parallelize(0 until n))
+      .map(x => ((x._1._1, x._2), x._1._2))
+      .coalesce(partitionsNb).cache()
 
     val skewedRddTransformed = skewedRdd
       .map(x => ((x._1, Random.nextInt(n - 1)), x._2)).cache()
 
-    println("<<<<<<< skewedRddTransformed >>>>>>>")
-    skewedRddTransformed.take(100).foreach(println)
-    println("<<<<<<< smallRddTransformed >>>>>>>")
-    smallRddTransformed.take(100).foreach(println)
+//    println("<<<<<<< skewedRddTransformed >>>>>>>")
+//    skewedRddTransformed.take(100).foreach(println)
+//    println("<<<<<<< smallRddTransformed >>>>>>>")
+//    smallRddTransformed.collect.foreach(println)
 
-    val now = DateTime.now()
-    val res = skewedRddTransformed.leftOuterJoin(smallRddTransformed)
-    res.count()
-    println(s"Time elapsed: " + new Period(now, DateTime.now()))
+//    val now = DateTime.now()
+//    val res = skewedRddTransformed.leftOuterJoin(smallRddTransformed)
+//    res.count()
+//    println(s"Time elapsed: " + PeriodFormat.getDefault.print(new Period(now, DateTime.now())))
 
     spark.stop()
   }
@@ -68,6 +65,6 @@ object App {
     val res = skewedRdd.leftOuterJoin(smallRdd)
     res.count()
 
-    println(s"Time elapsed: " + new Period(now, DateTime.now()))
+    println(s"Time elapsed: " + PeriodFormat.getDefault.print(new Period(now, DateTime.now())))
   }
 }
