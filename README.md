@@ -28,3 +28,8 @@ Data is naturally skewed to the right as the partition values with the same key
 grow exponentially until a total of 14 millions entities.
 
 A smaller rdd is generated with the same structure but with only 136 values linearly growing.
+
+A simple left join on the small rdd takes around 2mn30s and the spark UI shows clearly that the last partition
+is requires the most resources.
+
+![alt text](http://url/to/img.png)
