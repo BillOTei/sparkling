@@ -36,6 +36,7 @@ object App extends SparkSessionWrapper {
     * @return
     */
   private def jsonToDataset(path: String): Dataset[User] = {
+    println("Loading data...")
     spark.read.json(path).map(r => User(r.getAs[Long](0).toInt, r.getAs[String](1)))
   }
 
@@ -49,8 +50,8 @@ object App extends SparkSessionWrapper {
       dataset(partitionsNb, skewed = true).cache()
     }
 
-    println("Grouping by departmentId...")
-    skDataset.groupBy($"departmentId").count.show
+//    println("Grouping by departmentId...")
+//    skDataset.groupBy($"departmentId").count.show
 
     val dpts = departments.cache()
 
