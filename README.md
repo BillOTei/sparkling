@@ -17,9 +17,9 @@ until partition 15 containing 12 millions of values User(15, xxx).\
 Data is naturally skewed to the right as the partition values with the same key
 grow exponentially until a total of 14 millions entities.
 
-A smaller rdd is generated with the same structure but with only 136 values linearly growing.
+A smaller dataset is generated and represents only the referential Department(id, name) data.
 
-A simple left join on the small rdd takes around 2mn30s and the spark UI shows clearly that the last partition
-is requires the most resources.
+A simple inner join on the small dataset takes around 2mn30s and the spark UI shows clearly that the last partition
+requires the most resources.
 
 ![alt text](http://url/to/img.png)
