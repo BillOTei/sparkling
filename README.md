@@ -57,7 +57,7 @@ Repartition for partitions is as follows:
 |           2|    7|
 |           0|    1|`
 
-![job 2](https://ibb.co/f8hi29)
+[job 2](https://ibb.co/f8hi29)
 
 Results take around 2mn for both approach but for few thousand users (11 partitions). Higher nb of partitions requires 
 more computing power than available to me.
