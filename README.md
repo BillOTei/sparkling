@@ -27,7 +27,7 @@ The approach was to repartition skewed data thanks to a unique id added and then
 dataset to the big one. Another possibility could be to spread the small dataset across more partitions generating a new unique key
 as describe [here](https://stackoverflow.com/questions/40373577/skewed-dataset-join-in-spark).
 Results are quite good (around 2mn for a join with on Department Table) and clause in terms of duration, 
-leading to the conclusion that data was most likely not skewed enough.
+leading to the conclusion that data was most likely not skewed enough or that it would be necessary to use more nodes.
 
 **From memory**\
 Another option is to generate manually skewed data in memory:
@@ -63,8 +63,7 @@ Results take around 2mn for both approach but for few thousand users (11 partiti
 more computing power than available to me.
 
 Similar results for both approach lead to the conclusion that more tests are necessary with more representative datasets
-and repartition schemes.
-
+and repartition schemes as well as computing power and nodes use.
 
 The app is package with `sbt assembly`, it is configured (application.conf) to run locally with 4 cores cpus.
 To run it, simply use: \
